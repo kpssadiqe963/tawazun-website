@@ -363,7 +363,7 @@ tr:hover {
   <div class="dashboard hidden" id="dashboard">
 
     <!-- HEADER -->
-    <div style="
+    <div id="dashboardHeader" style="
       display:flex;
       justify-content:space-between;
       align-items:center;
@@ -382,29 +382,32 @@ tr:hover {
       </div>
 
       <!-- Right -->
-      <div style="display:flex; gap:10px;">
-        <button onclick="resetPage()" style="
-          background:#f39c12;
-          padding:6px 12px;
-          font-size:14px;
-          border-radius:6px;
-          border:none;
-        ">
-          🔄 Check Another
-        </button>
+      
 
         <button onclick="openPortal()" style="
   background:#3498db;
   color:white;
-  padding:8px 14px;
-  border-radius:8px;
+  padding:12px 24px;
+  font-size:16px;
+  border-radius:12px;
   border:none;
   font-weight:500;
 ">
   📚 Application Portal
 </button>
-        </a>
-      </div>
+ 
+<div style="display:flex; gap:10px;">
+        <button onclick="resetPage()" style="
+          background:#3498db;
+	  color:white;
+          padding:8px 14px;
+          font-size:14px;
+          border-radius:8px;
+          border:none;
+        ">
+          🚪 Logout
+        </button>       
+    </div>
 
     </div>
 
@@ -836,23 +839,31 @@ if (UPDATE_MODE) {
 
 function resetPage() {
 
-  // Clear inputs
+  currentUser = {};
+  allAvailableCourses = [];
+
   document.getElementById("admission").value = "";
   document.getElementById("password").value = "";
 
-  // Hide dashboard
-  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("loginBox")
+    .classList.remove("hidden");
 
-  // Show login
-  document.getElementById("loginBox").classList.remove("hidden");
+  document.getElementById("dashboard")
+    .classList.add("hidden");
 
-  // Reset sections
-  document.getElementById("teacherSection").style.display = "none";
-  document.getElementById("studentSection").style.display = "block";
+  document.getElementById("portalSection")
+    .classList.add("hidden");
 
-  // Reset cards
-  document.getElementById("cards").style.display = "grid";
+  document.getElementById("dashboardHeader")
+    .style.display = "flex";
+
+  document.getElementById("cards")
+    .style.display = "grid";
+
+  document.getElementById("studentSection")
+    .style.display = "block";
 }
+
 function loadTeacherTable(data) {
   fillTable("teacherTable", data);
 }
@@ -1014,16 +1025,23 @@ function isDateGreater(rowDate, startDate) {
 
   return parseRowDate(rowDate) >= parseInputDate(startDate);
 }
+
 function openPortal() {
 
-  document.getElementById("portalSection")
-    .classList.remove("hidden");
-
+  // Hide dashboard content
+  document.getElementById("cards")
+    .style.display = "none";
+document.getElementById("dashboardHeader")
+  .style.display = "none";
   document.getElementById("studentSection")
     .style.display = "none";
 
   document.getElementById("teacherSection")
     .style.display = "none";
+
+  // Show portal
+  document.getElementById("portalSection")
+    .classList.remove("hidden");
 
   document.getElementById("course-list").innerHTML =
     "<p>Loading courses...</p>";
@@ -1054,14 +1072,17 @@ function openPortal() {
 }
 function closePortal() {
 
+  // Hide portal
   document.getElementById("portalSection")
     .classList.add("hidden");
 
-  document.getElementById("studentSection")
-    .style.display = "block";
-
+  // Restore dashboard
   document.getElementById("cards")
     .style.display = "grid";
+document.getElementById("dashboardHeader")
+  .style.display = "flex";
+  document.getElementById("studentSection")
+    .style.display = "block";
 }
 
 function renderCourses(courses) {
@@ -1162,8 +1183,7 @@ function applyCourse(code, title, creds) {
   .then(data => {
 
     alert(data.message);
-
-    closePortal();
+    refreshDashboard();
 
   })
 
@@ -1172,6 +1192,33 @@ function applyCourse(code, title, creds) {
     console.error(err);
 
     alert("Application failed");
+
+  });
+}
+
+function refreshDashboard() {
+
+  fetch(API_URL + "?admission=" + currentUser.admNo)
+
+  .then(res => res.json())
+
+  .then(data => {
+
+    fillTable("pendingTable", data.pending);
+
+    fillTable("activeTable", data.active);
+
+    fillTable("completedTable", data.completed);
+
+    loadIndhar(data.indharReasons);
+
+    loadCards(data.summary);
+
+  })
+
+  .catch(err => {
+
+    console.error(err);
 
   });
 }
