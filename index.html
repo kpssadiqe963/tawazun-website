@@ -384,7 +384,8 @@ tr:hover {
       <!-- Right -->
       
 
-        <button onclick="openPortal()" style="
+        <button id="portalBtn" onclick="openPortal()"
+ style="
   background:#3498db;
   color:white;
   padding:12px 24px;
@@ -637,7 +638,8 @@ function login() {
       document.getElementById("cards").style.display = "none";
       document.getElementById("studentSection").style.display = "none";
       document.getElementById("teacherSection").style.display = "block";
-
+      document.getElementById("portalBtn")
+  .style.display = "none";
       loadTeacherTable(data.students);
       loadTeacherIndhar(data.indharList);
 
@@ -728,7 +730,8 @@ function fillTable(id, rows) {
 }
 // Cards
 function loadCards(data) {
-
+  document.getElementById("portalBtn")
+  .style.display = "inline-block"; 
   let container = document.getElementById("cards");
 
   container.innerHTML = `
