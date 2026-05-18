@@ -1084,10 +1084,18 @@ function closePortal() {
   // Restore dashboard
   document.getElementById("cards")
     .style.display = "grid";
-document.getElementById("dashboardHeader")
-  .style.display = "flex";
+
+  document.getElementById("dashboardHeader")
+    .style.display = "flex";
+
   document.getElementById("studentSection")
     .style.display = "block";
+
+  // =====================================
+  // REFRESH DASHBOARD DATA
+  // =====================================
+
+  refreshDashboard();
 }
 
 function renderCourses(courses) {
